@@ -1,28 +1,146 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <title>Cloud Chat Room</title>
+  <meta charset="UTF-8">
+  <title>Cloud Chat 💬</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #89f7fe, #66a6ff);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .chat-container {
+      width: 400px;
+      height: 550px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .header {
+      background: #4a6cf7;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message {
+      padding: 10px 14px;
+      border-radius: 18px;
+      max-width: 70%;
+      word-wrap: break-word;
+      font-size: 15px;
+    }
+
+    .my-message {
+      background: #4a6cf7;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .other-message {
+      background: #e4e6eb;
+      color: #333;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    .input-area {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+      background: #fafafa;
+    }
+
+    #msg {
+      flex: 1;
+      border: none;
+      outline: none;
+      border-radius: 20px;
+      padding: 10px 15px;
+      font-size: 15px;
+      background: #f0f2f5;
+    }
+
+    button {
+      border: none;
+      background: #4a6cf7;
+      color: white;
+      padding: 10px 18px;
+      margin-left: 8px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: #3355d5;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #ccc;
+      border-radius: 10px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Cloud Chat Room</h2>
-  <ul id="messages"></ul>
-  <input id="msg" autocomplete="off" /><button onclick="sendMessage()">Send</button>
+  <div class="chat-container">
+    <div class="header">☁ Cloud Chat</div>
+    <div class="messages" id="messages"></div>
 
-  <!-- Socket.IO client - use a compatible major version -->
+    <div class="input-area">
+      <input id="msg" placeholder="Type a message..." autocomplete="off" />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
   <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
   <script>
-    const socket = io(); // connects to the same host that served the page
-    socket.on('message', function(msg) {
-      const item = document.createElement('li');
-      item.textContent = msg;
-      document.getElementById('messages').appendChild(item);
+    const socket = io();
+    const msgBox = document.getElementById('msg');
+    const messagesDiv = document.getElementById('messages');
+    const user = "User" + Math.floor(Math.random() * 1000); // Random username
+
+    socket.on('message', function(data) {
+      const div = document.createElement('div');
+      div.classList.add('message');
+      div.classList.add(data.user === user ? 'my-message' : 'other-message');
+      div.textContent = `${data.user}: ${data.text}`;
+      messagesDiv.appendChild(div);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
     });
+
     function sendMessage() {
-      const msg = document.getElementById('msg').value;
-      if (!msg) return;
-      socket.send(msg);
-      document.getElementById('msg').value = '';
+      const text = msgBox.value.trim();
+      if (text === '') return;
+      socket.send({ user, text });
+      msgBox.value = '';
     }
   </script>
 </body>
