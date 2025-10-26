@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Cloud Chat Room</title>
+</head>
+<body>
+  <h2>Cloud Chat Room</h2>
+  <ul id="messages"></ul>
+  <input id="msg" autocomplete="off" /><button onclick="sendMessage()">Send</button>
+
+  <!-- Socket.IO client - use a compatible major version -->
+  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+  <script>
+    const socket = io(); // connects to the same host that served the page
+    socket.on('message', function(msg) {
+      const item = document.createElement('li');
+      item.textContent = msg;
+      document.getElementById('messages').appendChild(item);
+    });
+    function sendMessage() {
+      const msg = document.getElementById('msg').value;
+      if (!msg) return;
+      socket.send(msg);
+      document.getElementById('msg').value = '';
+    }
+  </script>
+</body>
+</html>
