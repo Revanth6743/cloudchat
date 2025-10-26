@@ -10,9 +10,9 @@ def home():
     return render_template('chat.html')
 
 @socketio.on('message')
-def handle_message(msg):
-    print('Message:', msg)
-    send(msg, broadcast=True)
+def handle_message(data):
+    print(f"{data['user']}: {data['text']}")
+    send(data, broadcast=True)
 
 if __name__ == '__main__':
     # For local dev only; production will use gunicorn + eventlet
